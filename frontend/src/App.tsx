@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import QRCode from "react-qr-code";
-import { useLocalStorage, useMap } from "usehooks-ts";
+import { useLocalStorage } from "usehooks-ts";
 import { useSSE } from "./hooks/use-sse.hook";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
@@ -36,9 +36,9 @@ const toOption = <T extends Teacher>(
 };
 const Form = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [teachers, setTeachers] = useLocalStorage("teachers", []);
+  const [teachers, setTeachers] = useLocalStorage<Teacher[]>("teachers", []);
 
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState<Teacher[]>([]);
 
   const [input, setInput] = useState("");
 
@@ -142,7 +142,7 @@ const Auth = () => {
   const isLoading = false;
   const payload = useSSE<string | null>("qr");
   useEffect(() => {
-    axios.get("http://localhost:3004").then((res) => {});
+    axios.get("http://localhost:3004").then(() => {});
   }, []);
 
   return (
@@ -159,7 +159,7 @@ const Auth = () => {
 function App() {
   const [isAuth, setIsAuth] = useLocalStorage("isAuth", true);
   useEffect(() => {
-    axios.get("http://localhost:3004").then((res) => {});
+    axios.get("http://localhost:3004").then(() => {});
   }, []);
 
   useSSE(

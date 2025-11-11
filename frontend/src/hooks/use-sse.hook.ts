@@ -12,7 +12,7 @@ export const useSSE = <T>(
   enabled: boolean = true
 ) => {
   const eventWithUrl = `${base_url}/${eventName}`;
-  const [payload, setPayload] = useState<T>(null);
+  const [payload, setPayload] = useState<T | null>(null);
 
   const sub = () => {
     if (!enabled) {
@@ -39,7 +39,7 @@ export const useSSE = <T>(
           ? payload.data
           : JSON.stringify(payload.data);
       if (data) {
-        setPayload(data);
+        setPayload(data as T);
       }
     };
 

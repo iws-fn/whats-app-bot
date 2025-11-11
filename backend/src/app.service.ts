@@ -14,24 +14,39 @@ export class AppService {
       },
       authStrategy: new LocalAuth(),
     });
+    
+    // Set up event listeners immediately
+    this.client.on('ready', () => {
+      console.log('✅ WhatsApp client is ready!');
+    });
+
+    this.client.on('qr', (qr) => {
+      console.log('📱 QR Code received:');
+      console.log(qr);
+      this.eventEmitter.emit('qr', qr);
+    });
+
+    this.client.on('authenticated', () => {
+      console.log('✅ WhatsApp authenticated!');
+      this.eventEmitter.emit('authenticated');
+    });
+
+    this.client.on('auth_failure', (msg) => {
+      console.error('❌ Authentication failed:', msg);
+    });
+
+    this.client.on('disconnected', (reason) => {
+      console.log('🔌 WhatsApp disconnected:', reason);
+    });
+
+    // Initialize the client
+    console.log('🚀 Initializing WhatsApp client...');
     this.client.initialize();
   }
+  
   auth(): void {
-    if (this.client) {
-      this.client.on('ready', () => {
-        console.log('im ready!');
-      });
-
-      this.client.on('qr', (qr) => {
-        console.log(qr);
-        this.eventEmitter.emit('qr', qr);
-      });
-
-      this.client.on('authenticated', () => {
-        console.log('auth!');
-        this.eventEmitter.emit('authenticated');
-      });
-    }
+    // This method is now just for compatibility
+    // Event listeners are already set up in constructor
   }
 
   async sendMessage(body: { phoneNumber: string; text: string }[]) {

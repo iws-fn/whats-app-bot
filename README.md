@@ -62,17 +62,68 @@ pnpm install
 
 ## 🚀 Running the Application
 
-### Start Backend (Port 3004)
+You have multiple options to run the application:
 
+### Option 1: Quick Start with Scripts (Recommended for Development)
+
+**Windows (PowerShell):**
+```powershell
+.\start-dev.ps1
+```
+
+**Linux/Mac:**
+```bash
+chmod +x start-dev.sh
+./start-dev.sh
+```
+
+The script will:
+- ✅ Check prerequisites
+- ✅ Install dependencies if needed
+- ✅ Download Chromium for Puppeteer
+- ✅ Start both backend and frontend servers
+- ✅ Clean up ports if already in use
+
+### Option 2: Docker (Recommended for Production)
+
+**Start with Docker Compose:**
+```bash
+docker-compose up -d
+```
+
+This will start:
+- Backend on `http://localhost:3004`
+- Frontend on `http://localhost:8080`
+
+**Stop containers:**
+```bash
+docker-compose down
+```
+
+**View logs:**
+```bash
+docker-compose logs -f
+```
+
+**Rebuild after changes:**
+```bash
+docker-compose up -d --build
+```
+
+### Option 3: Manual Start
+
+**Start Backend (Port 3004):**
 ```bash
 cd backend
+pnpm install
+node node_modules/puppeteer/install.mjs
 pnpm run start:dev
 ```
 
-### Start Frontend (Port 5173)
-
+**Start Frontend (Port 5173):**
 ```bash
 cd frontend
+pnpm install
 pnpm run dev
 ```
 
@@ -151,6 +202,7 @@ whats-app-bot/
 │   │   ├── app.module.ts        # App module
 │   │   └── main.ts              # Entry point
 │   ├── .wwebjs_auth/    # WhatsApp session data (gitignored)
+│   ├── Dockerfile       # Backend Docker image
 │   └── package.json
 │
 ├── frontend/            # React frontend
@@ -158,9 +210,53 @@ whats-app-bot/
 │   │   ├── App.tsx              # Main component
 │   │   ├── hooks/               # Custom hooks
 │   │   └── components/          # UI components
+│   ├── Dockerfile       # Frontend Docker image
 │   └── package.json
 │
+├── docker-compose.yml   # Docker orchestration
+├── start-dev.sh         # Linux/Mac startup script
+├── start-dev.ps1        # Windows startup script
+├── .dockerignore        # Docker ignore file
 └── README.md
+```
+
+## 🐳 Docker Deployment
+
+The application includes Docker support for easy deployment:
+
+### Docker Files
+
+- **`backend/Dockerfile`** - Multi-stage build for NestJS backend with Chromium
+- **`frontend/Dockerfile`** - Multi-stage build with Nginx for frontend
+- **`docker-compose.yml`** - Orchestrates both services with networking
+- **`.dockerignore`** - Excludes unnecessary files from Docker build
+
+### Docker Compose Services
+
+| Service | Port | Description |
+|---------|------|-------------|
+| backend | 3004 | NestJS API server with WhatsApp client |
+| frontend | 8080 | React app served via Nginx |
+
+### Production Deployment
+
+For production deployment:
+
+1. **Update frontend API URLs** to point to your production backend
+2. **Configure environment variables** in docker-compose.yml
+3. **Set up reverse proxy** (nginx/traefik) for HTTPS
+4. **Persistent volumes** are configured for WhatsApp session data
+5. **Set restart policy** to `unless-stopped` for auto-recovery
+
+### Environment Variables
+
+You can customize the deployment by adding environment variables to docker-compose.yml:
+
+```yaml
+environment:
+  - NODE_ENV=production
+  - PORT=3004
+  # Add more as needed
 ```
 
 ## 🔒 Security Notes
