@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Client, LocalAuth } from 'whatsapp-web.js';
+import * as puppeteer from 'puppeteer';
+
 @Injectable()
 export class AppService {
   client: Client;
@@ -8,7 +10,7 @@ export class AppService {
     this.client = new Client({
       puppeteer: {
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        executablePath: 'C:\\Users\\iwans\\.cache\\puppeteer\\chrome\\win64-142.0.7444.61\\chrome-win64\\chrome.exe',
+        executablePath: puppeteer.executablePath(),
       },
       authStrategy: new LocalAuth(),
     });

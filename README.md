@@ -129,11 +129,16 @@ axios.get("http://localhost:3004")
 
 ### Chrome Executable Path
 
-The Chrome path is configured in `backend/src/app.service.ts`. It's automatically set during installation, but you can update it if needed:
+The Chrome path is automatically detected in `backend/src/app.service.ts` using puppeteer:
 
 ```typescript
-executablePath: 'C:\\Users\\iwans\\.cache\\puppeteer\\chrome\\win64-142.0.7444.61\\chrome-win64\\chrome.exe'
+import * as puppeteer from 'puppeteer';
+
+// Automatically finds the installed Chromium
+executablePath: puppeteer.executablePath()
 ```
+
+No manual configuration needed!
 
 ## 📁 Project Structure
 
@@ -186,7 +191,17 @@ pnpm approve-builds
 
 ### Port Already in Use
 
-If port 3004 or 5173 is already in use, change the port in the respective configuration files.
+If port 3004 or 5173 is already in use, you can either:
+
+**Option 1: Kill the process using the port (Windows PowerShell)**
+```bash
+# For port 3004
+Get-NetTCPConnection -LocalPort 3004 | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force }
+```
+
+**Option 2: Change the port**
+- Backend: Edit `backend/src/main.ts`
+- Frontend: Edit `vite.config.ts`
 
 ### WhatsApp Disconnection
 
