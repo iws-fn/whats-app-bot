@@ -81,15 +81,17 @@ export class AppController {
     });
 
     const data = await result;
+    console.log(data);
     const onlyEkb = data.filter((item) => item['Город']?.includes('Екатеринбург'));
 
     const formatted = onlyEkb.map((item) => {
       return {
-        phoneNumber: item['Телефон для мессенджера'],
-        fio: item['ФИО учителя'],
+        phoneNumber: item['Телефон для мессенджера'] || item['Телефон для звонка'],
+        fio: item['ФИО учителя'] || item['ФИО педагога'],
         io: item['ИО учителя'],
       };
     });
+    console.log(formatted.map(item => item.phoneNumber));
     return uniqBy(formatted, 'phoneNumber')
   }
 
