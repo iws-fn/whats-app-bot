@@ -81,7 +81,7 @@ export class AppController {
     });
 
     const data = await result;
-    const onlyEkb = data.filter((item) => item['Город'].includes('Екатеринбург'));
+    const onlyEkb = data.filter((item) => item['Город']?.includes('Екатеринбург'));
 
     const formatted = onlyEkb.map((item) => {
       return {

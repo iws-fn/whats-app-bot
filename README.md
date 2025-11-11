@@ -194,9 +194,10 @@ pnpm approve-builds
 If port 3004 or 5173 is already in use, you can either:
 
 **Option 1: Kill the process using the port (Windows PowerShell)**
-```bash
+```powershell
 # For port 3004
-Get-NetTCPConnection -LocalPort 3004 | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force }
+$processes = Get-NetTCPConnection -LocalPort 3004 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess | Where-Object { $_ -gt 0 }
+if ($processes) { $processes | ForEach-Object { Stop-Process -Id $_ -Force } } else { Write-Host "Port 3004 is free" }
 ```
 
 **Option 2: Change the port**
