@@ -1,6 +1,6 @@
 import Button from "@mui/material/Button";
 import { styled } from "@mui/material/styles";
-import { ReactNode } from "react";
+import { ReactNode, useId } from "react";
 
 const Input = styled("input")({
   display: "none",
@@ -17,6 +17,8 @@ const UploadButton: React.FC<UploadButtonProps> = ({
   children,
   accept = "*/*",
 }) => {
+  const id = useId(); // Generate unique ID for each instance
+  
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -25,10 +27,10 @@ const UploadButton: React.FC<UploadButtonProps> = ({
   };
 
   return (
-    <label htmlFor="upload-button-file">
+    <label htmlFor={id}>
       <Input
         accept={accept}
-        id="upload-button-file"
+        id={id}
         type="file"
         onChange={handleFileChange}
       />

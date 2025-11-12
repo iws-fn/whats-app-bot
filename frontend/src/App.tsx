@@ -41,6 +41,7 @@ const Form = () => {
   const [selected, setSelected] = useState<Teacher[]>([]);
 
   const [input, setInput] = useState("");
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
 
   const options = teachers.map(toOption);
   const optionsWithoutSelected = useMemo(() => {
@@ -73,6 +74,11 @@ const Form = () => {
     }
   };
 
+  const handleAttachmentChange = (file: File) => {
+    console.log('handleAttachmentChange', file);
+    setAttachmentFile(file);
+  };
+
   const handleSendMessage = () => {
     const messages = selected.map((teacher) => {
       const text = input.replace("{{ИО}}", teacher.io);
@@ -83,12 +89,25 @@ const Form = () => {
     });
 
     setIsLoading(true);
-    axios.post("http://localhost:3004/send", messages).finally(() => {
-      setIsLoading(false);
-    });
+    
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(messages));
+    if (attachmentFile) {
+      formData.append("file", attachmentFile);
+    }
 
-    // Add your message sending logic here
+    axios
+      .post("http://localhost:3004/send", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
+
+  console.log(attachmentFile);
 
   return (
     <Stack spacing={4}>
@@ -116,6 +135,9 @@ const Form = () => {
       />
       <UploadButton onFileChange={handleFileChange}>
         {teachers.length ? "Обновить CSV" : "Загрузить CSV"}
+      </UploadButton>
+      <UploadButton onFileChange={handleAttachmentChange}>
+        {attachmentFile ? `📎 ${attachmentFile.name}` : "Прикрепить файл к сообщениям"}
       </UploadButton>
       {input && (
         <Stack spacing={1}>

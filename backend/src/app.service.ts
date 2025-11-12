@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Client, LocalAuth } from 'whatsapp-web.js';
+import { Client, LocalAuth, MessageMedia } from 'whatsapp-web.js';
 import * as puppeteer from 'puppeteer';
 
 @Injectable()
@@ -49,14 +49,33 @@ export class AppService {
     // Event listeners are already set up in constructor
   }
 
-  async sendMessage(body: { phoneNumber: string; text: string }[]) {
+  async sendMessage(
+    body: { phoneNumber: string; text: string }[],
+    file?: Express.Multer.File,
+  ) {
     const chats = await Promise.all(
       body.map((item) => this.client.getChatById(`${item.phoneNumber}@c.us`)),
     );
 
-    const messages = chats.map((chat, index) =>
-      chat.sendMessage(body[index].text),
-    );
+    // Если есть файл, создаем MessageMedia из него
+    let media: MessageMedia | undefined;
+    if (file) {
+      media = new MessageMedia(
+        file.mimetype,
+        file.buffer.toString('base64'),
+        file.originalname,
+      );
+    }
+
+    const messages = chats.map((chat, index) => {
+      if (media) {
+        // Отправляем файл с текстом в caption
+        return chat.sendMessage(media, { caption: body[index].text });
+      } else {
+        // Только текст
+        return chat.sendMessage(body[index].text);
+      }
+    });
 
     return Promise.all(messages);
   }

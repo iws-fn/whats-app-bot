@@ -81,7 +81,6 @@ export class AppController {
     });
 
     const data = await result;
-    console.log(data);
     const onlyEkb = data.filter((item) => item['Город']?.includes('Екатеринбург'));
 
     const formatted = onlyEkb.map((item) => {
@@ -96,10 +95,17 @@ export class AppController {
   }
 
   @Post('send')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
+      storage: memoryStorage(),
+    }),
+  )
   async send(
-    @Body()
-    body: { phoneNumber: string; text: string }[],
+    @Body('data') dataString: string,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    this.appService.sendMessage(body);
+    const body = JSON.parse(dataString);
+    return this.appService.sendMessage(body, file);
   }
 }
